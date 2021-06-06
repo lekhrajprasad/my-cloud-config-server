@@ -1,0 +1,31 @@
+server:
+   port: 8888
+spring:
+   profiles:
+      active: dev
+   application:
+      name: my-cloud-config-server
+   rabbitmq:
+      addresses: amqps://xrjbysaw:ESAki5A7fkGit0EMD3q2N6Z7V_KCK69J@fox.rmq.cloudamqp.com/xrjbysaw
+   cloud:
+      config:
+         server:
+            git: 
+               uri: https://github.com/lekhrajprasad/my-cloud-config-repo
+            #uri: "E:\\jenkins-workspace\\cloud-config-repo"
+eureka:
+   client:
+      service-url:
+         defaultZone: http://localhost:8762/eureka
+      #healthcheck:
+       #  enabled: true
+logging:
+   level:
+      root: INFO
+   pattern:
+#org.springframework.cloud: DEBUG
+      console: '%-5level [%thread]-${PID} %logger{36}  - %msg%n'
+# ----------------
+# Orphan comments:
+# ----------------
+# Was at begin of line:28 :#http://localhost:2345/actuator/
