@@ -16,7 +16,7 @@ spring:
 eureka:
    client:
       service-url:
-         defaultZone: http://23.22.226.19/:8762/eureka
+         defaultZone: http://23.22.226.19:8762/eureka
       #healthcheck:
        #  enabled: true
 logging:
