@@ -1,28 +1,32 @@
-FROM centos:8
-MAINTAINER lekhrajprasad
+FROM centos:8 as mybuild
+MAINTAINER lekhraj.prasad@gmail.com
+RUN yum install java-11-openjdk-devel git wget -y
 
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
-RUN yum install java-1.8.0-openjdk-devel git wget -y
-EXPOSE 2345
 ARG maven_version=3.8.1
 ENV M2_HOME=/usr/local/apache-maven-${maven_version}
 ENV M2="${M2_HOME}/bin"
-#Setting path
 ENV PATH=$PATH:$M2
 WORKDIR /opt/app
 RUN wget https://downloads.apache.org/maven/maven-3/${maven_version}/binaries/apache-maven-${maven_version}-bin.tar.gz -P /tmp \
     && tar xvfz /tmp/apache-maven-${maven_version}-bin.tar.gz -C /usr/local \
     && rm -rf /tmp/apache-maven-${maven_version}-bin.tar.gz \
     && yum clean all
-RUN export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
-RUN git clone https://github.com/lekhrajprasad/mybookstore-v-1.2.git /tmp/mybookstore
-RUN cd /tmp/mybookstore/cloud-config-server \
-    && mvn clean package
-RUN mv /tmp/mybookstore/cloud-config-server/target/*.jar /opt/app/app.jar
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.11.0.9-2.el8_4.x86_64
 
-RUN rm -rf /tmp/mybookstore
+RUN git clone https://github.com/lekhrajprasad/my-cloud-config-server.git /tmp/myapp \
+    && cd /tmp/myapp \
+    && mvn clean package \
+    && mv /tmp/myapp/target/*.jar /opt/app/app.jar
 
-CMD ["java", "-jar", "/opt/app/app.jar", "--spring.profiles.active=native"]
+RUN rm -rf /tmp/*
+
+FROM adoptopenjdk/openjdk11:jre-11.0.6_10-alpine
+EXPOSE 8888
+
+WORKDIR /opt
+COPY --from=mybuild /opt/app/app.jar /opt/app.jar
+VOLUME ["./logs"]
+ENTRYPOINT ["java", "-jar", "/opt/app.jar"]
 
 #To run mannualy command is docker build -t <imagename:version>
 #To creaet container : docker run -d -p 2345:2345 --name <containername> <imagename:version>
